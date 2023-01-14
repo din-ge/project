@@ -1,4 +1,4 @@
-//Подключаем модули галпа
+// გალპის მოდულების შემოტანა
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
@@ -7,82 +7,82 @@ const uglify = require('gulp-uglify');
 const del = require('del');
 const browserSync = require('browser-sync').create();
 
-//Порядок подключения css файлов
+// css ფაილების ჩართვის თანმიმდევრობა
 const cssFiles = [
    './src/css/main.css',
    './src/css/media.css'
 ]
-//Порядок подключения js файлов
+//js ფაილების ჩართვის თანმიმდევრობა
 const jsFiles = [
    './src/js/lib.js',
    './src/js/main.js'
 ]
 
-//Таск на стили CSS
+// CSS სტილების ჩართვის ამოცანა
 function styles() {
-   //Шаблон для поиска файлов CSS
-   //Всей файлы по шаблону './src/css/**/*.css'
+   // CSS ფაილების ძებნის შაბლონი
+   // ყველა ფაილი './src/css/**/*.css' შაბლონით
    return gulp.src(cssFiles)
-   //Объединение файлов в один
+   // ერთ ფაილში გაერთიანება
    .pipe(concat('style.css'))
-   //Добавить префиксы
+   // პრეფიქსების დამატება ბრაუზერებისთვის
    .pipe(autoprefixer({
       cascade: false
    }))
-   //Минификация CSS
+   // მინიმიზაცია
    .pipe(cleanCSS({
       level: 2
    }))
-   //Выходная папка для стилей
+   // კატალოგი სადაც ჩადებს
    .pipe(gulp.dest('./build/css'))
    .pipe(browserSync.stream());
 }
 
-//Таск на скрипты JS
+// JS სკრიპტების ამოცანა
 function scripts() {
-   //Шаблон для поиска файлов JS
-   //Всей файлы по шаблону './src/js/**/*.js'
+   // JS ფაილების ძებნის შაბლონი
+   // ყველა ფაილი ამ შაბლონით './src/js/**/*.js'
    return gulp.src(jsFiles)
-   //Объединение файлов в один
+   // ერთ ფაილში
    .pipe(concat('script.js'))
-   //Минификация JS
+   // მინიფიკაცია JS
    .pipe(uglify({
       toplevel: true
    }))
-   //Выходная папка для скриптов
+   // სკრიპტების კატალოგი
    .pipe(gulp.dest('./build/js'))
    .pipe(browserSync.stream());
 }
 
-//Удалить всё в указанной папке
+// ჩასუფთავება, ყველა ფაილის წაშლა
 function clean() {
    return del(['build/*'])
 }
 
-//Просматривать файлы
+// ფაილების ცვლილებებზე თვალთვალი
 function watch() {
    browserSync.init({
       server: {
           baseDir: "./"
       }
   });
-  //Следить за CSS файлами
+  // CSS ფაილებზე თვალთვალი
   gulp.watch('./src/css/**/*.css', styles)
-  //Следить за JS файлами
+  // JS ფაილების თვალთვალი
   gulp.watch('./src/js/**/*.js', scripts)
-  //При изменении HTML запустить синхронизацию
+  // HTML-ის შეცვლის შემთხვევაში იქნება სინქრონიზაცია
   gulp.watch("./*.html").on('change', browserSync.reload);
 }
 
-//Таск вызывающий функцию styles
+// ამოცანა, რომელიც იძახებს styles
 gulp.task('styles', styles);
-//Таск вызывающий функцию scripts
+// ამოცანა, რომელიც იძახებს  scripts
 gulp.task('scripts', scripts);
-//Таск для очистки папки build
+// ამოცანა, რომელიც ჩაასუფთავებს  build-ს
 gulp.task('del', clean);
-//Таск для отслеживания изменений
+// ამოცანა ცვლილებების სათვალთვალოდ
 gulp.task('watch', watch);
-//Таск для удаления файлов в папке build и запуск styles и scripts
+// ამოცანა, რომელიც წაშლის ფაილებს  build-ში და გაუშვებს  styles და scripts
 gulp.task('build', gulp.series(clean, gulp.parallel(styles,scripts)));
-//Таск запускает таск build и watch последовательно
+// ამოცანა გაუშვებს  build-ს და watch-ს ერთმანეთის მიყოლებით
 gulp.task('dev', gulp.series('build','watch'));
